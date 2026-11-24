@@ -1,23 +1,21 @@
-const CACHE_NAME = 'flashcard-pro-v33';
+const CACHE_NAME = 'flashcard-pro-v13';
 const ASSETS = [
     './',
     './index.html',
     './styles.css',
     './app.js',
     './manifest.json',
-    './data/group_1.js',
-    './data/group_2.js',
-    './data/group_3.js',
-    './data/group_4.js',
-    './data/group_5.js',
-    './data/group_6.js',
-    './data/group_7.js',
-    './data/group_8.js',
-    './data/group_9.js',
-    './data/group_10.js',
-    './data/group_11.js',
-    './data/group_12.js',
-    './data/group_13.js'
+    './group_1.js',
+    './group_2.js',
+    './group_3.js',
+    './group_4.js',
+    './group_5.js',
+    './group_6.js',
+    './group_7.js',
+    './group_8.js',
+    './group_9.js',
+    './group_10.js',
+    './group_11.js'
 ];
 
 self.addEventListener('install', (e) => {
@@ -43,21 +41,10 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    // Luôn ưu tiên mạng trước (Network first) để không bao giờ bị kẹt file data/code cũ
     e.respondWith(
-        fetch(e.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-                const responseClone = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(e.request, responseClone);
-                });
-            }
-            return networkResponse;
-        }).catch(() => {
-            return caches.match(e.request).then((cachedResponse) => {
-                if (cachedResponse) return cachedResponse;
-                return caches.match('./index.html');
-            });
+        caches.match(e.request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            return fetch(e.request).catch(() => caches.match('./index.html'));
         })
     );
 });
